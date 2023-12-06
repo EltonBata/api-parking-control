@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.api.parkingcontrol.dtos.ParkingSpotDto;
 import com.api.parkingcontrol.models.Car;
 import com.api.parkingcontrol.models.ParkingSpot;
+import com.api.parkingcontrol.services.CarService;
 import com.api.parkingcontrol.services.ParkingSpotService;
 import jakarta.validation.Valid;
 
@@ -27,6 +28,9 @@ public class ParkingSpotController {
     // Dependency Injection of service
     @Autowired
     ParkingSpotService parkingSpotService;
+
+    @Autowired
+    CarService carService;
 
     @PostMapping
 

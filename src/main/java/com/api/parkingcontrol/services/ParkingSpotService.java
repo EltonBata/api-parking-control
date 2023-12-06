@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 
 import com.api.parkingcontrol.models.Car;
 import com.api.parkingcontrol.models.ParkingSpot;
-import com.api.parkingcontrol.repositories.CarRepository;
 import com.api.parkingcontrol.repositories.ParkingSpotRepository;
 
 import jakarta.transaction.Transactional;
@@ -17,13 +16,14 @@ public class ParkingSpotService {
     @Autowired
     ParkingSpotRepository parkingSpotRepository;
 
+    //Dependency Injection of car service
     @Autowired
-    CarRepository carRepository;
+    CarService carService;
 
     @Transactional
     public ParkingSpot save(ParkingSpot parkingSpot, Car car) {
 
-        Car savedCar = carRepository.save(car);
+        Car savedCar = carService.save(car);
 
         parkingSpot.setCar(savedCar);
 
