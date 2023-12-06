@@ -8,7 +8,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -33,11 +32,6 @@ public class Car implements Serializable {
 
     @Column(nullable = false, length = 50)
     private String colorCar;
-
-    /** Relationships */
-
-    @OneToOne
-    private ParkingSpot parkingSpot;
 
     /** Getters and Setters */
 
@@ -83,14 +77,6 @@ public class Car implements Serializable {
 
     public void setId(UUID id) {
         this.id = id;
-    }
-
-    public ParkingSpot getParkingSpot() {
-        return parkingSpot;
-    }
-
-    public void setParkingSpot(ParkingSpot parkingSpot_id) {
-        this.parkingSpot = parkingSpot_id;
     }
 
 }
