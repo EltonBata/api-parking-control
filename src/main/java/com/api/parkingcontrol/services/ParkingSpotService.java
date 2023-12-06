@@ -1,5 +1,9 @@
 package com.api.parkingcontrol.services;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +20,7 @@ public class ParkingSpotService {
     @Autowired
     ParkingSpotRepository parkingSpotRepository;
 
-    //Dependency Injection of car service
+    // Dependency Injection of car service
     @Autowired
     CarService carService;
 
@@ -38,5 +42,22 @@ public class ParkingSpotService {
 
     public boolean existsByApartmentAndBlock(String apartment, String block) {
         return parkingSpotRepository.existsByApartmentAndBlock(apartment, block);
+    }
+
+    public List<ParkingSpot> findAll() {
+        return parkingSpotRepository.findAll();
+    }
+
+    public Optional<ParkingSpot> findById(UUID id) {
+        return parkingSpotRepository.findById(id);
+    }
+
+    public boolean existsById(UUID id) {
+        return parkingSpotRepository.existsById(id);
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        parkingSpotRepository.deleteById(id);
     }
 }

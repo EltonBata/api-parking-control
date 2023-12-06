@@ -2,12 +2,20 @@ package com.api.parkingcontrol.controllers;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -64,5 +72,54 @@ public class ParkingSpotController {
         return ResponseEntity.status(HttpStatus.CREATED).body(parkingSpotService.save(parkingSpot,
                 car));
 
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ParkingSpot>> getAllParkingSpot() {
+        return ResponseEntity.status(HttpStatus.OK).body(parkingSpotService.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> getOneParkingSpot(@PathVariable("id") UUID id) {
+
+        Optional<ParkingSpot> optionalParkingSpot = parkingSpotService.findById(id);
+
+        if (optionalParkingSpot.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Parking Spot not found");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(optionalParkingSpot.get());
+
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> deleteParkingSpot(@PathVariable("id") UUID id) {
+
+        if (!parkingSpotService.existsById(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Parking Spot not found");
+        }
+
+        parkingSpotService.delete(id);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Parking Spot deleted");
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Object> updateParkingSpot(@PathVariable("id") UUID id,
+            @RequestBody @Valid ParkingSpotDto parkingSpotDto) {
+
+        Optional<ParkingSpot> optionalParkingSpot = parkingSpotService.findById(id);
+
+        if (optionalParkingSpot.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Parking Spot not found");
+        }
+
+        var parkingSpot = optionalParkingSpot.get();
+        var car = optionalParkingSpot.get().getCar();
+
+        BeanUtils.copyProperties(parkingSpotDto, parkingSpot);
+        BeanUtils.copyProperties(parkingSpotDto, car);
+
+        return ResponseEntity.status(HttpStatus.OK).body(parkingSpotService.save(parkingSpot, car));
     }
 }
