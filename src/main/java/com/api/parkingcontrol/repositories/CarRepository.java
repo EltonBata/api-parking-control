@@ -10,4 +10,5 @@ import com.api.parkingcontrol.models.Car;
 @Repository
 public interface CarRepository extends JpaRepository<Car, UUID> {
 
+    boolean existsByLicencePlateCar(String lincencePlateCar);
 } 

@@ -2,7 +2,6 @@ package com.api.parkingcontrol.controllers;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,21 +33,36 @@ public class ParkingSpotController {
 
     @PostMapping
 
-    public ResponseEntity<ParkingSpot> saveParkingSpot(@RequestBody @Valid ParkingSpotDto parkingSpotDto) {
+    public ResponseEntity<Object> saveParkingSpot(@RequestBody @Valid ParkingSpotDto parkingSpotDto) {
+
+        // Verify some conflits with stored data that must be unique
+        if (carService.existsByLicencePlateCar(parkingSpotDto.licencePlateCar())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Licence Plate Car is already in use");
+        }
+
+        if (parkingSpotService.existsByParkingSpotNumber(parkingSpotDto.parkingSpotNumber())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Parking Spot Number is already in use");
+        }
+
+        if (parkingSpotService.existsByApartmentAndBlock(parkingSpotDto.apartment(), parkingSpotDto.block())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Parking Spot registered for this apartment or block");
+        }
 
         var parkingSpot = new ParkingSpot();
         var car = new Car();
 
-        //Converts validated parkingSpot data to parkingSpot model (bind) 
-        BeanUtils.copyProperties(parkingSpotDto, parkingSpot); 
+        // Converts validated parkingSpot data to parkingSpot model (bind)
+        BeanUtils.copyProperties(parkingSpotDto, parkingSpot);
 
-        //Converts validated car data to car model (bind) 
-        BeanUtils.copyProperties(parkingSpotDto, car); 
+        // Converts validated car data to car model (bind)
+        BeanUtils.copyProperties(parkingSpotDto, car);
 
-        //Set registrationData
+        // Set registrationData
         parkingSpot.setRegistrationDate(LocalDateTime.now(ZoneId.of("UTC")));
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(parkingSpotService.save(parkingSpot, car));
+        return ResponseEntity.status(HttpStatus.CREATED).body(parkingSpotService.save(parkingSpot,
+                car));
 
     }
 }

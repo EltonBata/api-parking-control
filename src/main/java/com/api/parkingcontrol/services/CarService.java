@@ -17,4 +17,8 @@ public class CarService {
         return carRepository.save(car);
     }
 
+    public boolean existsByLicencePlateCar(String licencePlateCar) {
+        return carRepository.existsByLicencePlateCar(licencePlateCar);
+    }
+
 }
