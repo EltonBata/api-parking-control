@@ -10,6 +10,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.parkingcontrol.dtos.ParkingSpotDto;
+import com.api.parkingcontrol.helpers.ValidationErrorMessages;
 import com.api.parkingcontrol.models.Car;
 import com.api.parkingcontrol.models.ParkingSpot;
 import com.api.parkingcontrol.services.CarService;
@@ -39,9 +41,17 @@ public class ParkingSpotController {
     @Autowired
     CarService carService;
 
-    @PostMapping
+    @Autowired
+    ValidationErrorMessages messages;
 
-    public ResponseEntity<Object> saveParkingSpot(@RequestBody @Valid ParkingSpotDto parkingSpotDto) {
+    @PostMapping
+    public ResponseEntity<Object> saveParkingSpot(@RequestBody @Valid ParkingSpotDto parkingSpotDto,
+            BindingResult result) {
+
+        if (result.hasErrors()) {
+            List<String> errors = messages.errorMessages(result);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+        }
 
         // Verify some conflits with stored data that must be unique
         if (carService.existsByLicencePlateCar(parkingSpotDto.licencePlateCar())) {
@@ -106,7 +116,12 @@ public class ParkingSpotController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Object> updateParkingSpot(@PathVariable("id") UUID id,
-            @RequestBody @Valid ParkingSpotDto parkingSpotDto) {
+            @RequestBody @Valid ParkingSpotDto parkingSpotDto, BindingResult result) {
+
+        if (result.hasErrors()) {
+            List<String> errors = messages.errorMessages(result);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+        }
 
         Optional<ParkingSpot> optionalParkingSpot = parkingSpotService.findById(id);
 
