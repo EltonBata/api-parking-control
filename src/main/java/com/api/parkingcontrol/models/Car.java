@@ -3,6 +3,8 @@ package com.api.parkingcontrol.models;
 import java.io.Serializable;
 import java.util.UUID;
 
+import org.springframework.hateoas.RepresentationModel;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,7 +19,7 @@ import lombok.Setter;
 @Getter
 @Setter
 
-public class Car implements Serializable {
+public class Car extends RepresentationModel<Car> implements Serializable {
     private static final long serialVersionUID = 1L; // control version number when serialized
 
     // change the default id(BigInt) to a id(UUID)

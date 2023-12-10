@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -89,8 +92,24 @@ public class ParkingSpotController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ParkingSpot>> getAllParkingSpot(@PageableDefault(page = 0, size = 10, sort = "id", direction = Direction.DESC) Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(parkingSpotService.findAll(pageable));
+    public ResponseEntity<Page<ParkingSpot>> getAllParkingSpot(
+            @PageableDefault(page = 0, size = 10, sort = "id", direction = Direction.DESC) Pageable pageable) {
+        Page<ParkingSpot> parkingSpotList = parkingSpotService.findAll(pageable);
+
+        if (!parkingSpotList.isEmpty()) {
+            for (ParkingSpot ps : parkingSpotList) {
+                UUID id = ps.getId();
+                ps.add(linkTo(methodOn(ParkingSpotController.class).getOneParkingSpot(id)).withSelfRel());
+
+                Car car = ps.getCar();
+
+                UUID car_id = car.getId();
+
+                car.add(linkTo(methodOn(CarController.class).getOneCar(car_id)).withSelfRel());
+            }
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(parkingSpotList);
     }
 
     @GetMapping("/{id}")
@@ -101,6 +120,14 @@ public class ParkingSpotController {
         if (optionalParkingSpot.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Parking Spot not found");
         }
+
+        optionalParkingSpot.get().add(linkTo(ParkingSpotController.class).withSelfRel());
+
+        Car car = optionalParkingSpot.get().getCar();
+
+        UUID car_id = car.getId();
+
+        car.add(linkTo(methodOn(CarController.class).getOneCar(car_id)).withSelfRel());
 
         return ResponseEntity.status(HttpStatus.OK).body(optionalParkingSpot.get());
 

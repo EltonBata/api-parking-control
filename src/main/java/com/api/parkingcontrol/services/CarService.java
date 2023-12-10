@@ -1,6 +1,11 @@
 package com.api.parkingcontrol.services;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import com.api.parkingcontrol.models.Car;
@@ -19,6 +24,14 @@ public class CarService {
 
     public boolean existsByLicencePlateCar(String licencePlateCar) {
         return carRepository.existsByLicencePlateCar(licencePlateCar);
+    }
+
+    public Page<Car> findAll(Pageable pageable) {
+        return carRepository.findAll(pageable);
+    }
+
+    public Optional<Car> findById(UUID id) {
+        return carRepository.findById(id);
     }
 
 }
