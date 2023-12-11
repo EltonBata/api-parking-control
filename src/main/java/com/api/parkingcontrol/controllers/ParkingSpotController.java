@@ -17,6 +17,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,6 +52,7 @@ public class ParkingSpotController {
     @Autowired
     ValidationErrorMessages messages;
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping
     public ResponseEntity<Object> saveParkingSpot(@RequestBody @Valid ParkingSpotDto parkingSpotDto,
             BindingResult result) {
@@ -91,6 +93,7 @@ public class ParkingSpotController {
 
     }
 
+    @PreAuthorize(value = "hasRole('ROLE_ADMIN')")
     @GetMapping
     public ResponseEntity<Page<ParkingSpot>> getAllParkingSpot(
             @PageableDefault(page = 0, size = 10, sort = "id", direction = Direction.DESC) Pageable pageable) {
@@ -112,6 +115,8 @@ public class ParkingSpotController {
         return ResponseEntity.status(HttpStatus.OK).body(parkingSpotList);
     }
 
+
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
     @GetMapping("/{id}")
     public ResponseEntity<Object> getOneParkingSpot(@PathVariable("id") UUID id) {
 
@@ -133,6 +138,7 @@ public class ParkingSpotController {
 
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deleteParkingSpot(@PathVariable("id") UUID id) {
 
@@ -145,6 +151,7 @@ public class ParkingSpotController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("Parking Spot deleted");
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<Object> updateParkingSpot(@PathVariable("id") UUID id,
             @RequestBody @Valid ParkingSpotDto parkingSpotDto, BindingResult result) {
@@ -153,6 +160,7 @@ public class ParkingSpotController {
             List<String> errors = messages.errorMessages(result);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
         }
+        
 
         Optional<ParkingSpot> optionalParkingSpot = parkingSpotService.findById(id);
 
